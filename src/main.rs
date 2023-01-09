@@ -1,6 +1,6 @@
-use walkdir::WalkDir;
 use pbr::ProgressBar;
 use std::env;
+use walkdir::WalkDir;
 
 mod image_transforms;
 use image_transforms::{check_encoded_size, process_image};
@@ -14,8 +14,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let walker = WalkDir::new(images_path);
     let mut progress_bar = ProgressBar::new(filecount);
 
-    for entry in walker.into_iter().filter_map(|e| e.ok()) {
-
+    for entry in walker.into_iter().flatten() {
         if entry.metadata()?.is_file() {
             if let Some(filename) = entry.path().to_str() {
                 let filesize = check_encoded_size(filename)?;

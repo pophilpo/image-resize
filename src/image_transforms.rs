@@ -34,14 +34,14 @@ fn compute_ratio_slow(image: DynamicImage) -> f32 {
     // This is omega slow. Maybe do a binary search ?
 
     let mut ratio = 2.5;
-    let mut max_image_size = 0;
+    let max_image_size = 0;
     let dimensions = image.dimensions();
 
     while ratio > 1.3 && max_image_size < 1000000 {
         ratio = ratio - 0.3;
         let new_width = (dimensions.0 as f32 / ratio) as u32;
         let new_height = (dimensions.1 as f32 / ratio) as u32;
-        let tmp_image = image.resize(new_width, new_height, Triangle);
+        let _tmp_image = image.resize(new_width, new_height, Triangle);
         //let mut buff = Vec::new();
         //tmp_image
         //.write_to(&mut buff, image::ImageFormat::Jpeg)

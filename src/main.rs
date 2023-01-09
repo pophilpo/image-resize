@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if entry.metadata()?.is_file() {
             if let Some(filename) = entry.path().to_str() {
                 let filesize = check_encoded_size(filename)?;
-                if 1000000 <= filesize {
+                if filesize <= 1000000 {
                     continue;
                 }
 

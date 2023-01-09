@@ -3,13 +3,13 @@ use image::io::Reader as ImageReader;
 use image::{DynamicImage, GenericImageView, ImageFormat};
 use std::{fs, os::unix::fs::MetadataExt};
 
-pub fn check_encoded_size(image_path: &str) -> Result<u64, Box<dyn std::error::Error>> {
+pub fn check_encoded_size(image_path: &str) -> std::io::Result<u64> {
     let meta = fs::metadata(image_path)?;
     let filesize = meta.size();
     return Ok(filesize);
 }
 
-pub fn process_image(image_path: &str, image_size: u64) -> Result<(), Box<dyn std::error::Error>> {
+pub fn process_image(image_path: &str, image_size: u64) -> image::ImageResult<()> {
     let image = read_image(image_path)?;
     let ratio = compute_ratio_fast(image_size);
 
@@ -21,7 +21,7 @@ pub fn process_image(image_path: &str, image_size: u64) -> Result<(), Box<dyn st
     Ok(())
 }
 
-pub fn read_image(image_path: &str) -> Result<DynamicImage, Box<dyn std::error::Error>> {
+pub fn read_image(image_path: &str) -> image::ImageResult<DynamicImage> {
     let image = ImageReader::open(image_path)?.decode()?;
     return Ok(image);
 }
@@ -44,8 +44,8 @@ fn compute_ratio_slow(image: DynamicImage) -> f32 {
         let tmp_image = image.resize(new_width, new_height, Triangle);
         //let mut buff = Vec::new();
         //tmp_image
-            //.write_to(&mut buff, image::ImageFormat::Jpeg)
-            //.unwrap();
+        //.write_to(&mut buff, image::ImageFormat::Jpeg)
+        //.unwrap();
         //max_image_size = buff.len();
         //println!("Ratio {}, image_size {} bytes", ratio, max_image_size);
     }

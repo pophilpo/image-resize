@@ -38,7 +38,7 @@ fn compute_ratio_slow(image: DynamicImage) -> f32 {
     let dimensions = image.dimensions();
 
     while ratio > 1.3 && max_image_size < 1000000 {
-        ratio = ratio - 0.3;
+        ratio = ratio - 0.2;
         let new_width = (dimensions.0 as f32 / ratio) as u32;
         let new_height = (dimensions.1 as f32 / ratio) as u32;
         let _tmp_image = image.resize(new_width, new_height, Triangle);

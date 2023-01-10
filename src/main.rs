@@ -1,4 +1,4 @@
-use pbr::ProgressBar;
+use indicatif::{ProgressBar, ProgressStyle};
 use std::env;
 use std::process::exit;
 use walkdir::WalkDir;
@@ -19,7 +19,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let walker = WalkDir::new(images_path);
     let filecount = walker.into_iter().count() as u64;
     let walker = WalkDir::new(images_path);
-    let mut progress_bar = ProgressBar::new(filecount);
+    let progress_bar = ProgressBar::new(filecount);
+
+    progress_bar.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}]")
+            .unwrap(),
+    );
 
     for entry in walker.into_iter().flatten() {
         if entry.metadata()?.is_file() {
@@ -34,8 +40,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
-        progress_bar.inc();
+        progress_bar.inc(1);
+        std::thread::sleep(std::time::Duration::from_secs(2));
     }
 
+    progress_bar.finish();
     Ok(())
 }

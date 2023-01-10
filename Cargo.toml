@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 image = "0.24.5"
 walkdir = "2"
-pbr = "1.0.4"
+indicatif = "0.17.2"
 

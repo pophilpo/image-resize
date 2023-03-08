@@ -1,4 +1,5 @@
 use indicatif::{ProgressBar, ProgressStyle};
+use rayon::prelude::*;
 use std::env;
 use std::process::exit;
 use walkdir::WalkDir;
@@ -27,12 +28,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .unwrap(),
     );
 
-    for entry in walker.into_iter().flatten() {
-        if entry.metadata()?.is_file() {
+    let entries: Vec<_> = walker.into_iter().flatten().collect();
+    entries.par_iter().for_each(|entry| {
+        if entry.metadata().map(|m| m.is_file()).unwrap_or(false) {
             if let Some(filename) = entry.path().to_str() {
-                let filesize = check_encoded_size(filename)?;
+                let filesize = check_encoded_size(filename).unwrap_or(0);
                 if filesize <= 1000000 {
-                    continue;
+                    return;
                 }
 
                 if let Err(e) = process_image(filename, filesize) {
@@ -41,9 +43,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         progress_bar.inc(1);
-        std::thread::sleep(std::time::Duration::from_secs(2));
-    }
+    });
 
     progress_bar.finish();
     Ok(())
 }
+

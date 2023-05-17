@@ -3,8 +3,6 @@ use image::io::Reader as ImageReader;
 use image::{DynamicImage, GenericImageView, ImageFormat};
 use std::{fs, io::BufReader, os::unix::fs::MetadataExt};
 
-use exif;
-
 pub fn read_exif_metadata(image_path: &str) -> Option<u32> {
     let file = fs::File::open(image_path).unwrap();
 
@@ -27,7 +25,7 @@ pub fn read_exif_metadata(image_path: &str) -> Option<u32> {
 pub fn check_encoded_size(image_path: &str) -> std::io::Result<u64> {
     let meta = fs::metadata(image_path)?;
     let filesize = meta.size();
-    return Ok(filesize);
+    Ok(filesize)
 }
 
 pub fn process_image(image_path: &str, image_size: u64) -> image::ImageResult<()> {
@@ -57,9 +55,9 @@ pub fn process_image(image_path: &str, image_size: u64) -> image::ImageResult<()
 
 pub fn read_image(image_path: &str) -> image::ImageResult<DynamicImage> {
     let image = ImageReader::open(image_path)?.decode()?;
-    return Ok(image);
+    Ok(image)
 }
 
 pub fn compute_ratio_fast(image_size: u64) -> f64 {
-    return image_size as f64 / 1000000.0;
+    image_size as f64 / 1000000.0
 }

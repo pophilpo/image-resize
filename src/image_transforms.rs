@@ -1,9 +1,7 @@
-use image::imageops::Triangle;
+use image::imageops::{overlay, Triangle};
 use image::io::Reader as ImageReader;
-use image::{DynamicImage, GenericImageView, ImageFormat};
+use image::{DynamicImage, GenericImageView, ImageFormat, Rgba};
 use std::{fs, io::BufReader, os::unix::fs::MetadataExt};
-
-use exif;
 
 pub fn read_exif_metadata(image_path: &str) -> Option<u32> {
     let file = fs::File::open(image_path).unwrap();
@@ -27,7 +25,7 @@ pub fn read_exif_metadata(image_path: &str) -> Option<u32> {
 pub fn check_encoded_size(image_path: &str) -> std::io::Result<u64> {
     let meta = fs::metadata(image_path)?;
     let filesize = meta.size();
-    return Ok(filesize);
+    Ok(filesize)
 }
 
 pub fn process_image(image_path: &str, image_size: u64) -> image::ImageResult<()> {
@@ -51,15 +49,23 @@ pub fn process_image(image_path: &str, image_size: u64) -> image::ImageResult<()
         _ => tmp_image,
     };
 
-    rotated_image.save_with_format(image_path, ImageFormat::Jpeg)?;
+    let (w, h) = rotated_image.dimensions();
+    let mut white_background = image::ImageBuffer::from_fn(w, h, |_, _| Rgba([255, 255, 255, 255]));
+
+    overlay(&mut white_background, &rotated_image.to_rgba8(), 0, 0);
+
+    let final_image = DynamicImage::ImageRgba8(white_background);
+
+    final_image.save_with_format(image_path, ImageFormat::Jpeg)?;
     Ok(())
 }
 
 pub fn read_image(image_path: &str) -> image::ImageResult<DynamicImage> {
     let image = ImageReader::open(image_path)?.decode()?;
-    return Ok(image);
+    Ok(image)
 }
 
 pub fn compute_ratio_fast(image_size: u64) -> f64 {
-    return image_size as f64 / 1000000.0;
+    let ratio = image_size as f64 / 1000000.0;
+    ratio.sqrt()
 }

@@ -1,6 +1,6 @@
-use image::imageops::Triangle;
+use image::imageops::{overlay, Triangle};
 use image::io::Reader as ImageReader;
-use image::{DynamicImage, GenericImageView, ImageFormat};
+use image::{DynamicImage, GenericImageView, ImageFormat, Rgba};
 use std::{fs, io::BufReader, os::unix::fs::MetadataExt};
 
 pub fn read_exif_metadata(image_path: &str) -> Option<u32> {
@@ -49,7 +49,14 @@ pub fn process_image(image_path: &str, image_size: u64) -> image::ImageResult<()
         _ => tmp_image,
     };
 
-    rotated_image.save_with_format(image_path, ImageFormat::Jpeg)?;
+    let (w, h) = rotated_image.dimensions();
+    let mut white_background = image::ImageBuffer::from_fn(w, h, |_, _| Rgba([255, 255, 255, 255]));
+
+    overlay(&mut white_background, &rotated_image.to_rgba8(), 0, 0);
+
+    let final_image = DynamicImage::ImageRgba8(white_background);
+
+    final_image.save_with_format(image_path, ImageFormat::Jpeg)?;
     Ok(())
 }
 

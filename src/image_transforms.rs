@@ -66,5 +66,6 @@ pub fn read_image(image_path: &str) -> image::ImageResult<DynamicImage> {
 }
 
 pub fn compute_ratio_fast(image_size: u64) -> f64 {
-    image_size as f64 / 1000000.0
+    let ratio = image_size as f64 / 1000000.0;
+    ratio.sqrt()
 }
